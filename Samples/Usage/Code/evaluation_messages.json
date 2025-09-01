@@ -1,0 +1,11 @@
+{
+    "es": {
+        "sampleQuestion1": "Pregunta 1 fallada",
+        "sampleQuestion2": "Pregunta 2 fallada"
+
+    },
+    "en": {
+        "sampleQuestion1": "Question 1 failed",
+        "sampleQuestion2": "Question 2 failed"
+    }
+}

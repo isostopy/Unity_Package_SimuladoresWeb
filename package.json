@@ -1,0 +1,15 @@
+{
+	"name": "com.isostopy.simuladores-web",
+	"displayName": "Simuladores Web",
+	"version":"1.0.0",
+	"description": "Paquete de Unity para generar simuladores web rápidamente",
+	"author": "isostopy",
+	"samples":
+	[
+		{
+			"displayName":"Basic Usage",
+			"description":"Escena en la que se muestra el funcionamiento del paquete.",
+			"path":"Samples/Usage"
+		}
+	]
+}
