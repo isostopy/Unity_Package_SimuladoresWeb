@@ -328,6 +328,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2177825295299867052, guid: a1e2c586e60636848b35911076f204a4, type: 3}
+      propertyPath: m_text
+      value: "Pulsa para enviar un post de prueba y ver el Json generado.\n\nSe est\xE1
+        simulando responder dos preguntas y fallar la segunda."
+      objectReference: {fileID: 0}
     - target: {fileID: 3463717639106209036, guid: a1e2c586e60636848b35911076f204a4, type: 3}
       propertyPath: OnSelection.m_PersistentCalls.m_Calls.Array.size
       value: 1
@@ -343,6 +348,10 @@ PrefabInstance:
     - target: {fileID: 3463717639106209036, guid: a1e2c586e60636848b35911076f204a4, type: 3}
       propertyPath: OnSelection.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: SampleManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 6991885413675778161, guid: a1e2c586e60636848b35911076f204a4, type: 3}
+      propertyPath: m_text
+      value: Test Post
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
