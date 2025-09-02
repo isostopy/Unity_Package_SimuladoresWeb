@@ -109,7 +109,7 @@ public class PlayerInteractionController : MonoBehaviour
         }
         else
         {
-            ChangePlayerPosition(newTransform.position);
+            ChangePlayerPosition(teleportPose.position);
         }
 
         yield return new WaitForSeconds(0.5f);
@@ -141,15 +141,7 @@ public class PlayerInteractionController : MonoBehaviour
         // Desktop/Web: clic izquierdo
         if (svc.Mouse != null && svc.Mouse.LeftDown)
         {
-            bool canTeleport = raycast != null && raycast.teleportGizmo != null && raycast.teleportGizmo.activeSelf;
-            if (canTeleport)
-            {
-                TeleportPlayer(raycast.teleportGizmo.transform, false);
-            }
-            else
-            {
-                Select(raycast.CheckSelection());
-            }
+            OnClickLogic();
         }
 
         // WebGL/Móvil: TAP básico con un dedo
@@ -176,19 +168,25 @@ public class PlayerInteractionController : MonoBehaviour
                 if (isTap)
                 {
                     AimRayFromScreenPosition(_lastTouchPos);
-                    bool canTeleportTouch = raycast != null && raycast.teleportGizmo != null && raycast.teleportGizmo.activeSelf;
-                    if (canTeleportTouch)
-                    {
-                        TeleportPlayer(raycast.teleportGizmo.transform, false);
-                    }
-                    else
-                    {
-                        Select(raycast.CheckSelection());
-                    }
+                    OnClickLogic();
                 }
             }
         }
     }
+
+    void OnClickLogic()
+    {
+        bool canTeleport = raycast != null && raycast.teleportGizmo != null && raycast.teleportGizmo.activeSelf;
+        if (canTeleport)
+        {
+            TeleportPlayer(raycast.teleportGizmo.transform, false);
+        }
+        else
+        {
+            Select(raycast.CheckSelection());
+        }
+    }
+
 }
 
 

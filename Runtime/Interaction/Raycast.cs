@@ -64,6 +64,9 @@ public class Raycast : MonoBehaviour
 
             if (selection == null)
             {
+                if (_lastObject != null) _lastObject.SelectionExit();
+                _lastObject = null;
+
                 if (teleportGizmo)
                 {
                     teleportGizmo.SetActive(false);
@@ -134,6 +137,6 @@ public class Raycast : MonoBehaviour
 
             return null;
         }
-        
+
     }
 }
