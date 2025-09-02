@@ -9,7 +9,7 @@
 		{
 			"displayName":"Basic Usage",
 			"description":"Escena en la que se muestra el funcionamiento del paquete.",
-			"path":"Samples/Usage"
+			"path":"~Samples/Usage"
 		}
 	]
 }
