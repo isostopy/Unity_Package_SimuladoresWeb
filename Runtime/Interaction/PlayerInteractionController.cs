@@ -27,6 +27,10 @@ public class PlayerInteractionController : MonoBehaviour
     [HideInInspector] public const float TapMaxDuration = 0.25f; // s
     [HideInInspector] public const float TapMaxMove = 25f;       // px acumulados
 
+    [Header("Teleport")]
+    public bool useDropdown;
+    public TeleportPoint[] teleportPoints;
+
     void Update()
     {
         RayToMouse();
@@ -47,8 +51,6 @@ public class PlayerInteractionController : MonoBehaviour
         raycast.transform.forward = target;
     }
 
-    #endregion
-
     // Apuntar el ray a una posición de pantalla específica (para tap)
     public void AimRayFromScreenPosition(Vector2 screenPos)
     {
@@ -57,17 +59,9 @@ public class PlayerInteractionController : MonoBehaviour
         raycast.transform.forward = dir;
     }
 
-    public void Select(ISelectable selection)
-    {
-        if (selection == null) return;
+    #endregion
 
-        _currentSelection = selection;
-
-        if (_lastSelection != null) _lastSelection.SelectionDeselect();
-
-        _lastSelection = _currentSelection;
-        selection.SelectionSelect();
-    }
+    #region Teleport
 
     public void TeleportPlayer(Transform newTransform)
     {
@@ -133,6 +127,41 @@ public class PlayerInteractionController : MonoBehaviour
         firstPersonLook.CenterLook();
     }
 
+    // Teletransportar usando un id definido en la lista de teleportPoints
+    public void TeleportToId(string teleportId)
+    {
+        if (string.IsNullOrEmpty(teleportId) || teleportPoints == null || teleportPoints.Length == 0) return;
+
+        for (int i = 0; i < teleportPoints.Length; i++)
+        {
+            var tp = teleportPoints[i];
+            if (tp == null) continue;
+            if (tp.id == teleportId && tp.teleportPoint != null)
+            {
+                TeleportPlayer(tp.teleportPoint, true);
+                return;
+            }
+        }
+
+        Debug.LogWarning($"TeleportPoint con id '{teleportId}' no encontrado o sin Transform asignado.");
+    }
+
+    #endregion
+
+    #region Inputs & Selection
+
+    public void Select(ISelectable selection)
+    {
+        if (selection == null) return;
+
+        _currentSelection = selection;
+
+        if (_lastSelection != null) _lastSelection.SelectionDeselect();
+
+        _lastSelection = _currentSelection;
+        selection.SelectionSelect();
+    }
+
     private void HandleInputs()
     {
         var svc = InputService.Instance;
@@ -186,6 +215,8 @@ public class PlayerInteractionController : MonoBehaviour
             Select(raycast.CheckSelection());
         }
     }
+
+    #endregion
 
 }
 
