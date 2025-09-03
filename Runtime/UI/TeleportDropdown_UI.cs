@@ -1,11 +1,11 @@
 using TMPro;
 using UnityEngine;
 
-public class TeleportDropdown : MonoBehaviour
+public class TeleportDropdown_UI : MonoBehaviour
 {
 
-    [SerializeField] TMP_Dropdown dropdown;
     [SerializeField] PlayerInteractionController player;
+    [SerializeField] TMP_Dropdown dropdown;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

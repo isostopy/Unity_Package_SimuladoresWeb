@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 
 public class PlayerInteractionController : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class PlayerInteractionController : MonoBehaviour
 
     private Coroutine teleportCoroutine;
     private bool _crRunning;
+    private Transform _teleportHelper; // Transform auxiliar reutilizable para llamadas a TeleportPlayer
 
     // Soporte mínimo de TAP táctil (WebGL/móvil)
     [HideInInspector] public bool _wasTouching;
@@ -127,7 +129,29 @@ public class PlayerInteractionController : MonoBehaviour
         firstPersonLook.CenterLook();
     }
 
-    // Teletransportar usando un id definido en la lista de teleportPoints
+    public void TeleportToSelectionAnchor()
+    {
+        if (_currentSelection == null) return;
+
+        var go = _currentSelection.gameObject;
+        if (go == null) return;
+
+        var anchorComp = go.GetComponent<SelectableTeleportAnchor>();
+        if (anchorComp != null && anchorComp.anchor != null)
+        {
+            if (_teleportHelper == null)
+            {
+                var helperGo = new GameObject("__TeleportHelper");
+                helperGo.hideFlags = HideFlags.HideAndDontSave;
+                _teleportHelper = helperGo.transform;
+            }
+
+            _teleportHelper.position = anchorComp.anchor.position;
+            _teleportHelper.rotation = anchorComp.useAnchorRotation ? anchorComp.anchor.rotation : transform.rotation;
+            TeleportPlayer(_teleportHelper, anchorComp.useAnchorRotation);
+        }
+    }
+
     public void TeleportToId(string teleportId)
     {
         if (string.IsNullOrEmpty(teleportId) || teleportPoints == null || teleportPoints.Length == 0) return;
@@ -150,9 +174,18 @@ public class PlayerInteractionController : MonoBehaviour
 
     #region Inputs & Selection
 
+
+    public bool HasSelection => _currentSelection != null;
+
     public void Select(ISelectable selection)
     {
-        if (selection == null) return;
+        if (selection == null)
+        {
+            if (_lastSelection != null) _lastSelection.SelectionDeselect();
+            _currentSelection = null;
+            _lastSelection = null;
+            return;
+        }
 
         _currentSelection = selection;
 
@@ -162,10 +195,26 @@ public class PlayerInteractionController : MonoBehaviour
         selection.SelectionSelect();
     }
 
+    // Indica si la selección actual tiene un SelectableTeleportAnchor con anchor válido
+    public bool SelectionHasTeleportAnchor()
+    {
+        if (_currentSelection == null) return false;
+        var go = _currentSelection.gameObject;
+        if (go == null) return false;
+        var anchorComp = go.GetComponent<SelectableTeleportAnchor>();
+        return anchorComp != null && anchorComp.anchor != null;
+    }
+
     private void HandleInputs()
     {
         var svc = InputService.Instance;
         if (svc == null) return;
+
+        // Evitar interferir con la UI: si el puntero está sobre un elemento UI, ignorar inputs de interacción
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
 
         // Desktop/Web: clic izquierdo
         if (svc.Mouse != null && svc.Mouse.LeftDown)
@@ -177,6 +226,7 @@ public class PlayerInteractionController : MonoBehaviour
         var touch = svc.Touch;
         if (touch != null && touch.IsTouchSupported)
         {
+            // Nota: si se necesita, se puede extender con IsPointerOverGameObject(fingerId)
             if (touch.IsTouching && touch.ActiveTouchCount == 1)
             {
                 if (!_wasTouching)
@@ -215,6 +265,7 @@ public class PlayerInteractionController : MonoBehaviour
             Select(raycast.CheckSelection());
         }
     }
+
 
     #endregion
 
