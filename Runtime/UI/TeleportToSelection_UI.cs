@@ -5,6 +5,8 @@ public class TeleportToSelection_UI : MonoBehaviour
 {
     [SerializeField] PlayerInteractionController player;
     [SerializeField] Button teleportFrontButton;
+    
+    bool _hiddenUntilSelectionChanges;
 
     void Awake()
     {
@@ -13,7 +15,11 @@ public class TeleportToSelection_UI : MonoBehaviour
             Debug.Log("Listener added");
             teleportFrontButton.onClick.AddListener(OnTeleportFrontClicked);
         }
-        UpdateVisibility();
+        if (player != null)
+        {
+            player.OnSelectionChanged += HandleSelectionChanged;
+        }
+        UpdateVisibility(true);
     }
 
     void OnDestroy()
@@ -22,21 +28,43 @@ public class TeleportToSelection_UI : MonoBehaviour
         {
             teleportFrontButton.onClick.RemoveListener(OnTeleportFrontClicked);
         }
+        if (player != null)
+        {
+            player.OnSelectionChanged -= HandleSelectionChanged;
+        }
     }
 
     void Update()
     {
-        UpdateVisibility();
+        UpdateVisibility(false);
     }
 
-    void UpdateVisibility()
+    void UpdateVisibility(bool selectionChanged = false)
     {
         if (teleportFrontButton == null) return;
         bool visible = player != null && player.SelectionHasTeleportAnchor();
         var go = teleportFrontButton.gameObject;
-        if (go.activeSelf != visible)
+        if (selectionChanged)
         {
-            go.SetActive(visible);
+            // Si cambió la selección, sincronizamos visibilidad con el estado actual
+            _hiddenUntilSelectionChanges = false;
+            if (go.activeSelf != visible)
+            {
+                go.SetActive(visible);
+            }
+        }
+        else
+        {
+            // Sin cambio de selección: mantener oculto si fue forzado a ocultarse tras teletransporte
+            if (_hiddenUntilSelectionChanges && go.activeSelf)
+            {
+                go.SetActive(false);
+            }
+            // Solo actualizamos a false si ya no es válido mostrarlo
+            if (!visible && go.activeSelf)
+            {
+                go.SetActive(false);
+            }
         }
         teleportFrontButton.interactable = visible;
     }
@@ -46,6 +74,17 @@ public class TeleportToSelection_UI : MonoBehaviour
         if (player == null) return;
         Debug.Log("Click On Go To selection");
         player.TeleportToSelectionAnchor();
+        // Ocultar hasta que el usuario cambie la selección
+        if (teleportFrontButton != null)
+        {
+            teleportFrontButton.gameObject.SetActive(false);
+            _hiddenUntilSelectionChanges = true;
+        }
+    }
+
+    void HandleSelectionChanged(ISelectable _)
+    {
+        UpdateVisibility(true);
     }
 }
 

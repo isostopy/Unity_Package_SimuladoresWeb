@@ -1831,6 +1831,10 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 70234060}
+    - target: {fileID: 7649895844609524997, guid: 50a2e12e264c9fb489738c3cc0f4f7b3, type: 3}
+      propertyPath: headerText
+      value: Teleport Points
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2005,6 +2009,7 @@ SceneRoots:
   - {fileID: 278738871}
   - {fileID: 85738153}
   - {fileID: 1468423265405858246}
+  - {fileID: 179019980}
   - {fileID: 367266492}
   - {fileID: 255748501}
   - {fileID: 4989341760674157221}
@@ -2013,4 +2018,3 @@ SceneRoots:
   - {fileID: 1706298060}
   - {fileID: 406775907}
   - {fileID: 748640273}
-  - {fileID: 179019980}

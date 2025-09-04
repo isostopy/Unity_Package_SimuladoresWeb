@@ -6,6 +6,7 @@ public class TeleportDropdown_UI : MonoBehaviour
 
     [SerializeField] PlayerInteractionController player;
     [SerializeField] TMP_Dropdown dropdown;
+    [SerializeField] string headerText = "— Selecciona destino —";
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -50,13 +51,18 @@ public class TeleportDropdown_UI : MonoBehaviour
             return;
         }
 
+        // Insertar cabecera en la primera posición
+        string header = string.IsNullOrEmpty(headerText) ? "— Selecciona destino —" : headerText;
+        options.Insert(0, new TMP_Dropdown.OptionData(header));
+        optionIds.Insert(0, string.Empty);
+
         dropdown.AddOptions(options);
 
         // Guardar mapping en el componente para usarlo en el callback
         _optionIds = optionIds;
 
         // Seleccionar la primera opción válida
-        dropdown.value = 0;
+        dropdown.value = 0; // cabecera
         dropdown.RefreshShownValue();
     }
 
@@ -79,8 +85,14 @@ public class TeleportDropdown_UI : MonoBehaviour
     void OnDropdownChanged(int index)
     {
         if (player == null || _optionIds == null || index < 0 || index >= _optionIds.Count) return;
+        // Ignorar selección de la cabecera
+        if (index == 0) return;
         var id = _optionIds[index];
         player.TeleportToId(id);
+        // Volver a seleccionar la cabecera sin notificar para evitar bucles e
+        // inducir cambio de valor en la próxima selección (aunque repita opción)
+        dropdown.SetValueWithoutNotify(0);
+        dropdown.RefreshShownValue();
     }
 
     void SetDropdownActive(bool isActive)

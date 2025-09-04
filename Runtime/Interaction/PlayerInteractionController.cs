@@ -1,4 +1,5 @@
 using System.Collections;
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
@@ -32,6 +33,9 @@ public class PlayerInteractionController : MonoBehaviour
     [Header("Teleport")]
     public bool useDropdown;
     public TeleportPoint[] teleportPoints;
+
+    // Evento que notifica cuando cambia la selección actual
+    public event Action<ISelectable> OnSelectionChanged;
 
     void Update()
     {
@@ -184,6 +188,7 @@ public class PlayerInteractionController : MonoBehaviour
             if (_lastSelection != null) _lastSelection.SelectionDeselect();
             _currentSelection = null;
             _lastSelection = null;
+            OnSelectionChanged?.Invoke(null);
             return;
         }
 
@@ -193,6 +198,7 @@ public class PlayerInteractionController : MonoBehaviour
 
         _lastSelection = _currentSelection;
         selection.SelectionSelect();
+        OnSelectionChanged?.Invoke(_currentSelection);
     }
 
     // Indica si la selección actual tiene un SelectableTeleportAnchor con anchor válido
