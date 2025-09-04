@@ -1,27 +1,24 @@
-using Unity.Multiplayer.Center.Common;
-using UnityEditor.UIElements;
 using UnityEngine;
 
 public class SampleManager : MonoBehaviour
 {
     string dateStart;
 
-    // Usadas para calcular el porcentaje de acierto, es decir la puntuación.
+    // Usadas para calcular el porcentaje de acierto, es decir la puntuaciï¿½n.
     int answeredRight;
     int questionCount;
 
     public void Start()
     {
-        // Es necesario inicializar el sistema de evaluación. Y tener el archivo "evaluation_messages" en StreamingAssets
+        // Es necesario inicializar el sistema de evaluaciï¿½n. Y tener el archivo "evaluation_messages" en StreamingAssets
         StartCoroutine(EvaluationInfoManager.InitializeAsync());
         StartSimulation();
     }
 
     public void StartSimulation()
     {
-        // Es necesario guardar la fecha hora de inicio de la simulación
+        // Es necesario guardar la fecha hora de inicio de la simulaciï¿½n
         dateStart = System.DateTime.Now.ToString();
-        Debug.Log(dateStart);
     }
 
     // Esto es un ejemplo ficticio que debe adaptarse al comportamiento y funcionalidad de cada simulador
@@ -34,7 +31,7 @@ public class SampleManager : MonoBehaviour
         }
         else
         {
-            // Esto añade el id a una lista de IDs que registra los fallos, cada id tiene un mensaje de Error asosciado en un JSON.
+            // Esto aï¿½ade el id a una lista de IDs que registra los fallos, cada id tiene un mensaje de Error asosciado en un JSON.
             EvaluationInfoManager.AddIdToList(questionID); 
         }
     }
@@ -51,6 +48,8 @@ public class SampleManager : MonoBehaviour
         Debug.Log(json);
 
         EvaluationRecordManager.Instance.SendPost(EvaluationRecordManager.Instance.url, json);
+        FindFirstObjectByType<WebRedirect>().Redirect("https://test.isostopyserver.net/plataformaSim/frontend/dashboard.html");
+
     }
 
 }

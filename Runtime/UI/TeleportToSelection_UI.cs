@@ -12,7 +12,6 @@ public class TeleportToSelection_UI : MonoBehaviour
     {
         if (teleportFrontButton != null)
         {
-            Debug.Log("Listener added");
             teleportFrontButton.onClick.AddListener(OnTeleportFrontClicked);
         }
         if (player != null)
