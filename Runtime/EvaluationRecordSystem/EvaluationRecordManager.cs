@@ -69,6 +69,7 @@ public class EvaluationRecordManager : MonoBehaviour
         {
             // Error de transporte o similar
             Debug.Log($"❌ Error: {req.error}\nHTTP {(int)req.responseCode}\n{req.downloadHandler.text}");
+            FindFirstObjectByType<WebRedirect>().Redirect("https://test.isostopyserver.net/plataformaSim/frontend/dashboard.html");
         }
         else
         {
@@ -76,6 +77,7 @@ public class EvaluationRecordManager : MonoBehaviour
             var status = (int)req.responseCode;
             var text = req.downloadHandler.text;
             Debug.Log($"✅ HTTP {status}\n{text}");
+            FindFirstObjectByType<WebRedirect>().Redirect("https://test.isostopyserver.net/plataformaSim/frontend/dashboard.html");
         }
     }
 

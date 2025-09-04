@@ -48,7 +48,6 @@ public class SampleManager : MonoBehaviour
         Debug.Log(json);
 
         EvaluationRecordManager.Instance.SendPost(EvaluationRecordManager.Instance.url, json);
-        FindFirstObjectByType<WebRedirect>().Redirect("https://test.isostopyserver.net/plataformaSim/frontend/dashboard.html");
 
     }
 
