@@ -1,12 +1,15 @@
 using System.Runtime.InteropServices;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class WebRedirect : MonoBehaviour
 {
+    [SerializeField] private string url;
+
     [DllImport("__Internal")]
     private static extern void GoToURL(string url);
 
-    public void Redirect(string url)
+    public void Redirect()
     {
 #if !UNITY_EDITOR && UNITY_WEBGL
         GoToURL(url);
