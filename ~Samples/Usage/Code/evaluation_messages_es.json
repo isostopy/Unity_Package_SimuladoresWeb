@@ -1,0 +1,12 @@
+{
+    "messages": [
+        {
+            "id": "sampleQuestion1",
+            "message": "Pregunta 1 fallada"
+        },
+        {
+            "id": "sampleQuestion2",
+            "message": "Pregunta 2 fallada"
+        }
+    ]
+}
