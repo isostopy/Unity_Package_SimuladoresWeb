@@ -14,6 +14,13 @@ public class PlayerInteractionController : MonoBehaviour
     [Header("Cámara")]
     [SerializeField] private Camera myCamera;
 
+    [Header("Interaction")]
+    [SerializeField] bool useInteractionInput = true;
+
+    [Header("Teleport")]
+    public bool useDropdown;
+    public TeleportPoint[] teleportPoints;
+
     // --- Estado interno ---
     private ISelectable _currentSelection;
     private ISelectable _lastSelection;
@@ -30,18 +37,14 @@ public class PlayerInteractionController : MonoBehaviour
     [HideInInspector] public const float TapMaxDuration = 0.25f; // s
     [HideInInspector] public const float TapMaxMove = 25f;       // px acumulados
 
-    [Header("Teleport")]
-    public bool useDropdown;
-    public TeleportPoint[] teleportPoints;
-
     // Evento que notifica cuando cambia la selección actual
     public event Action<ISelectable> OnSelectionChanged;
 
     void Update()
     {
         RayToMouse();
-        HandleInputs();
         raycast.CheckSelection();
+        if(useInteractionInput) HandleInputs();
     }
 
     #region Modify raycast

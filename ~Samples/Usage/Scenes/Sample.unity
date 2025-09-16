@@ -1535,6 +1535,53 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6938987575591146930, guid: a78e83115baff8d48acdee6a624a9bb9, type: 3}
   m_PrefabInstance: {fileID: 1624060590}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1706196318
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1706196320}
+  - component: {fileID: 1706196319}
+  m_Layer: 0
+  m_Name: EvaluationInfoManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1706196319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1706196318}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbb3109ddec55eb4a8d0c724b4dd6ea5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  languages:
+  - languageCode: es
+    jsonFile: {fileID: 4900000, guid: 8f080bf9eed60bb41b4fc952022d045f, type: 3}
+--- !u!4 &1706196320
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1706196318}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.84371895, y: 1.867087, z: 4.3953886}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1706298057
 GameObject:
   m_ObjectHideFlags: 0
@@ -2245,6 +2292,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3957770057936770015, guid: 5c042f6b014000a4cb2178ac731ca879, type: 3}
+      propertyPath: useInteractionInput
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3957770057936770015, guid: 5c042f6b014000a4cb2178ac731ca879, type: 3}
       propertyPath: teleportPoints.Array.size
       value: 3
       objectReference: {fileID: 0}
@@ -2814,6 +2865,7 @@ SceneRoots:
   - {fileID: 278738871}
   - {fileID: 1334412474711723830}
   - {fileID: 722868630}
+  - {fileID: 1706196320}
   - {fileID: 1468423265405858246}
   - {fileID: 179019980}
   - {fileID: 367266492}

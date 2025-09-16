@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
-using System.IO;
 using UnityEngine;
-using UnityEngine.Networking;
 
 // Estructura simple para mensajes de evaluación
 [System.Serializable]
@@ -19,131 +17,136 @@ public class MessageEntry
     public string message;
 }
 
-public static class EvaluationInfoManager
+public class EvaluationInfoManager : MonoBehaviour
 {
+    [System.Serializable]
+    public class LanguageItem
+    {
+        public string languageCode;
+        public TextAsset jsonFile;
+    }
+
+    [Header("Idiomas (asignar TextAssets por inspector)")]
+    public List<LanguageItem> languages = new List<LanguageItem>();
+
     // Lista de logs generales de la evaluación
-    private static readonly List<string> evaluationLogs = new List<string>();
+    private readonly List<string> evaluationLogs = new List<string>();
 
-    private static Dictionary<string, Dictionary<string, string>> allLanguagesMessages = new Dictionary<string, Dictionary<string, string>>();
-    private static HashSet<string> failuresStoredIds = new HashSet<string>();
-    private static string currentLanguage = "es";
-    private static bool isInitialized = false;
+    private Dictionary<string, Dictionary<string, string>> allLanguagesMessages = new Dictionary<string, Dictionary<string, string>>();
+    private HashSet<string> failuresStoredIds = new HashSet<string>();
+    private string currentLanguage = "es";
+    private bool isInitialized = false;
 
-    public static bool IsInitialized => isInitialized;
+    private static EvaluationInfoManager _instance;
+    public static EvaluationInfoManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+                _instance = FindFirstObjectByType<EvaluationInfoManager>();
+            return _instance;
+        }
+    }
+
+    public static bool IsInitialized => Instance != null && Instance.isInitialized;
+
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        _instance = this;
+    }
+
+    private void Start()
+    {
+        if (!isInitialized)
+            StartCoroutine(InitializeAsync());
+    }
 
     public static IEnumerator InitializeAsync()
     {
-        if (isInitialized) yield break;
+        if (Instance != null && Instance.isInitialized) yield break;
 
-        // Detectar y cargar todos los idiomas disponibles
-        yield return LoadAllAvailableLanguages();
-        isInitialized = true;
+        if (Instance != null && Instance.languages != null && Instance.languages.Count > 0)
+        {
+            LoadLanguagesFromInspector();
+        }
+        else
+        {
+            Debug.LogWarning("EvaluationInfoManager: no hay idiomas asignados en el inspector.");
+        }
+
+        if (Instance != null) Instance.isInitialized = true;
     }
 
     /// <summary>
     /// Detecta y carga todos los idiomas disponibles automáticamente
     /// </summary>
-    private static IEnumerator LoadAllAvailableLanguages()
+    // Eliminado soporte de carga automática por StreamingAssets o ScriptableObject
+
+    private static void LoadLanguagesFromInspector()
     {
-        // Lista de idiomas comunes a intentar cargar
-        string[] commonLanguages = { "es","en","fr","de","it","pt","ru","zh"};
-        
-        allLanguagesMessages.Clear();
-        
-        foreach (string language in commonLanguages)
+        Instance.allLanguagesMessages.Clear();
+
+        foreach (var item in Instance.languages)
         {
-            yield return LoadLanguageMessages(language);
-        }
-        
-        Debug.Log($"Cargados {allLanguagesMessages.Count} idiomas: {string.Join(", ", allLanguagesMessages.Keys)}");
-    }
-
-    /// <summary>
-    /// Carga los mensajes de un idioma específico desde su archivo JSON
-    /// </summary>
-    private static IEnumerator LoadLanguageMessages(string language)
-    {
-        string filename = $"evaluation_messages_{language}.json";
-        string url = GetStreamingAssetsUrl(filename);
-
-        using (var req = UnityWebRequest.Get(url))
-        {
-            yield return req.SendWebRequest();
-
-#if UNITY_2020_2_OR_NEWER
-            bool ok = req.result == UnityWebRequest.Result.Success;
-#else
-            bool ok = !req.isNetworkError && !req.isHttpError;
-#endif
-
-            if (!ok)
-            {
-                // No es error si el archivo no existe, simplemente no cargamos ese idioma
-                Debug.Log($"Archivo de idioma no encontrado: {filename}");
-                yield break;
-            }
+            if (item == null || item.jsonFile == null || string.IsNullOrWhiteSpace(item.languageCode))
+                continue;
 
             try
             {
-                string json = req.downloadHandler.text;
-                var evaluationMessages = JsonUtility.FromJson<EvaluationMessages>(json);
-                
+                var evaluationMessages = JsonUtility.FromJson<EvaluationMessages>(item.jsonFile.text);
+
                 var languageMessages = new Dictionary<string, string>();
-                
-                // Cargar mensajes del idioma
                 if (evaluationMessages?.messages != null)
                 {
                     foreach (var msg in evaluationMessages.messages)
                     {
                         if (!string.IsNullOrEmpty(msg.id) && !string.IsNullOrEmpty(msg.message))
-                        {
                             languageMessages[msg.id] = msg.message;
-                        }
                     }
-                    
-                    // Solo agregar si tiene mensajes válidos
+
                     if (languageMessages.Count > 0)
                     {
-                        allLanguagesMessages[language] = languageMessages;
-                        Debug.Log($"Idioma '{language}' cargado con {languageMessages.Count} mensajes");
+                        Instance.allLanguagesMessages[item.languageCode] = languageMessages;
+                        Debug.Log($"Idioma '{item.languageCode}' cargado desde inspector con {languageMessages.Count} mensajes");
                     }
                 }
             }
             catch (System.Exception ex)
             {
-                Debug.LogError($"Error al deserializar {filename}: " + ex.Message);
+                Debug.LogError($"Error al deserializar idioma '{item?.languageCode}' desde inspector: " + ex.Message);
             }
+        }
+
+        if (Instance.allLanguagesMessages.Count == 0)
+        {
+            Debug.LogWarning("No se cargaron idiomas desde el inspector.");
         }
     }
 
-    private static string GetStreamingAssetsUrl(string filename)
-    {
-        string path = Path.Combine(Application.streamingAssetsPath, filename);
+    // Eliminado proveedor externo; solo se usa la lista del inspector
 
-        // Si ya es una URL (http/https/jar), la devolvemos tal cual
-        if (path.StartsWith("http", System.StringComparison.OrdinalIgnoreCase) ||
-            path.StartsWith("jar:", System.StringComparison.OrdinalIgnoreCase))
-            return path;
-
-        // Para rutas locales, UnityWebRequest necesita el prefijo file://
-        if (!path.StartsWith("file://"))
-            path = "file://" + path;
-
-        return path;
-    }
+    /// <summary>
+    /// Carga los mensajes de un idioma específico desde su archivo JSON
+    /// </summary>
+    // Eliminado: utilidades de StreamingAssets
 
     #region Failure Messages
 
     public static void AddIdToList(string id)
     {
         GuardInitialized();
-        failuresStoredIds.Add(id);
+        Instance.failuresStoredIds.Add(id);
     }
 
     public static string GetFailureMessages()
     {
         GuardInitialized();
-        var messages = failuresStoredIds.Select(GetMessage).ToList();
+        var messages = Instance.failuresStoredIds.Select(GetMessage).ToList();
         return string.Join(", ", messages);
     }
 
@@ -151,7 +154,7 @@ public static class EvaluationInfoManager
     {
         GuardInitialized();
 
-        if (allLanguagesMessages.TryGetValue(currentLanguage, out var languageMessages) &&
+        if (Instance.allLanguagesMessages.TryGetValue(Instance.currentLanguage, out var languageMessages) &&
             languageMessages.TryGetValue(id, out var msg) && 
             !string.IsNullOrWhiteSpace(msg))
             return msg;
@@ -159,7 +162,7 @@ public static class EvaluationInfoManager
         return $"[Mensaje no encontrado: {id}]";
     }
 
-    public static void ClearFailures() => failuresStoredIds.Clear();
+    public static void ClearFailures() => Instance.failuresStoredIds.Clear();
 
     #endregion
 
@@ -169,7 +172,7 @@ public static class EvaluationInfoManager
     {
         GuardInitialized();
         if (!string.IsNullOrWhiteSpace(log))
-            evaluationLogs.Add(log.Trim());
+            Instance.evaluationLogs.Add(log.Trim());
     }
 
     /// <summary>
@@ -180,18 +183,18 @@ public static class EvaluationInfoManager
         GuardInitialized();
 
         // Empezamos con los logs generales
-        var combined = new List<string>(evaluationLogs);
+        var combined = new List<string>(Instance.evaluationLogs);
 
         // Integramos los failures como mensajes legibles
-        if (failuresStoredIds.Count > 0)
-            combined.AddRange(failuresStoredIds.Select(GetMessage));
+        if (Instance.failuresStoredIds.Count > 0)
+            combined.AddRange(Instance.failuresStoredIds.Select(GetMessage));
 
         return string.Join(", ", combined);
     }
 
     public static void ClearLogs()
     {
-        evaluationLogs.Clear();
+        Instance.evaluationLogs.Clear();
     }
 
     #endregion
@@ -200,16 +203,16 @@ public static class EvaluationInfoManager
 
     public static void SetLanguage(string langCode)
     {
-        if (currentLanguage == langCode) return;
+        if (Instance.currentLanguage == langCode) return;
 
         // Verificar si el idioma está disponible
-        if (!allLanguagesMessages.ContainsKey(langCode))
+        if (!Instance.allLanguagesMessages.ContainsKey(langCode))
         {
-            Debug.LogWarning($"Idioma '{langCode}' no está disponible. Idiomas disponibles: {string.Join(", ", allLanguagesMessages.Keys)}");
+            Debug.LogWarning($"Idioma '{langCode}' no está disponible. Idiomas disponibles: {string.Join(", ", Instance.allLanguagesMessages.Keys)}");
             return;
         }
 
-        currentLanguage = langCode;
+        Instance.currentLanguage = langCode;
         Debug.Log($"Idioma cambiado a: {langCode}");
     }
 
@@ -219,7 +222,7 @@ public static class EvaluationInfoManager
     public static string[] GetAvailableLanguages()
     {
         GuardInitialized();
-        return allLanguagesMessages.Keys.ToArray();
+        return Instance.allLanguagesMessages.Keys.ToArray();
     }
 
     /// <summary>
@@ -228,80 +231,21 @@ public static class EvaluationInfoManager
     public static bool IsLanguageAvailable(string langCode)
     {
         GuardInitialized();
-        return allLanguagesMessages.ContainsKey(langCode);
+        return Instance.allLanguagesMessages.ContainsKey(langCode);
     }
 
-    public static string GetCurrentLanguage() => currentLanguage;
+    public static string GetCurrentLanguage() => Instance.currentLanguage;
 
     /// <summary>
     /// Carga un idioma personalizado desde una ruta específica
     /// </summary>
-    public static IEnumerator LoadCustomLanguage(string languageCode, string customPath)
-    {
-        string url = GetStreamingAssetsUrl(customPath);
-
-        using (var req = UnityWebRequest.Get(url))
-        {
-            yield return req.SendWebRequest();
-
-#if UNITY_2020_2_OR_NEWER
-            bool ok = req.result == UnityWebRequest.Result.Success;
-#else
-            bool ok = !req.isNetworkError && !req.isHttpError;
-#endif
-
-            if (!ok)
-            {
-                Debug.LogError($"No se pudo cargar idioma personalizado desde {customPath}: {req.error}");
-                yield break;
-            }
-
-            try
-            {
-                string json = req.downloadHandler.text;
-                var evaluationMessages = JsonUtility.FromJson<EvaluationMessages>(json);
-                
-                var languageMessages = new Dictionary<string, string>();
-                
-                if (evaluationMessages?.messages != null)
-                {
-                    foreach (var msg in evaluationMessages.messages)
-                    {
-                        if (!string.IsNullOrEmpty(msg.id) && !string.IsNullOrEmpty(msg.message))
-                        {
-                            languageMessages[msg.id] = msg.message;
-                        }
-                    }
-                    
-                    if (languageMessages.Count > 0)
-                    {
-                        allLanguagesMessages[languageCode] = languageMessages;
-                        Debug.Log($"Idioma personalizado '{languageCode}' cargado desde {customPath} con {languageMessages.Count} mensajes");
-                    }
-                }
-            }
-            catch (System.Exception ex)
-            {
-                Debug.LogError($"Error al deserializar idioma personalizado desde {customPath}: " + ex.Message);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Agrega idiomas personalizados a la lista de idiomas a cargar
-    /// </summary>
-    public static void AddCustomLanguagesToLoad(string[] customLanguages)
-    {
-        // Esto se puede usar para extender la lista de idiomas comunes
-        // antes de llamar a InitializeAsync()
-        Debug.Log($"Idiomas personalizados registrados: {string.Join(", ", customLanguages)}");
-    }
+    // Eliminado: carga de idiomas por URL/Resources y API de idiomas personalizados
 
     #endregion
 
     private static void GuardInitialized()
     {
-        if (!isInitialized)
-            Debug.LogError("EvaluationInfoManager no está inicializado. Llama antes a StartCoroutine(EvaluationInfoManager.InitializeAsync()).");
+        if (Instance == null || !Instance.isInitialized)
+            Debug.LogError("EvaluationInfoManager no está inicializado. Agrega el componente a la escena, asigna idiomas y llama a StartCoroutine(EvaluationInfoManager.InitializeAsync()).");
     }
 }

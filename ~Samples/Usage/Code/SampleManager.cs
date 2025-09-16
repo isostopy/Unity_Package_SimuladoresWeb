@@ -10,8 +10,6 @@ public class SampleManager : MonoBehaviour
 
     public void Start()
     {
-        // Es necesario inicializar el sistema de evaluaci�n. Y tener el archivo "evaluation_messages" en StreamingAssets
-        StartCoroutine(EvaluationInfoManager.InitializeAsync());
         StartSimulation();
     }
 
