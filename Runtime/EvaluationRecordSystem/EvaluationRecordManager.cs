@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 public class EvaluationRecordManager : MonoBehaviour
 {
@@ -49,12 +50,12 @@ public class EvaluationRecordManager : MonoBehaviour
     }
 
     // POST
-    public void SendPost(string url, string jsonData)
+    public void SendPost(string url, string jsonData, UnityAction<bool> onCompleted = null)
     {
-        StartCoroutine(PostRequest(url, jsonData));
+        StartCoroutine(PostRequest(url, jsonData, onCompleted));
     }
 
-    private IEnumerator PostRequest(string endpoint, string jsonData)
+    private IEnumerator PostRequest(string endpoint, string jsonData, UnityAction<bool> onCompleted = null)
     {
         if (postStatusText != null)
         {
@@ -86,6 +87,7 @@ public class EvaluationRecordManager : MonoBehaviour
             {
                 postStatusText.text = $"{errorMessage} (HTTP {(int)req.responseCode})";
             }
+            onCompleted?.Invoke(false);
         }
         else
         {
@@ -97,6 +99,7 @@ public class EvaluationRecordManager : MonoBehaviour
             {
                 postStatusText.text = successMessage;
             }
+            onCompleted?.Invoke(true);
         }
     }
 
