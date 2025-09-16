@@ -335,6 +335,9 @@ MonoBehaviour:
   fader: {fileID: 6123179466629151998}
   firstPersonLook: {fileID: 8279832691650354793}
   myCamera: {fileID: 6928897142550734413}
+  useInteractionInput: 1
+  useDropdown: 0
+  teleportPoints: []
   _wasTouching: 0
   _touchStartTime: 0
   _touchMoveAccum: 0
