@@ -72,35 +72,37 @@ public class PlayerInteractionController : MonoBehaviour
 
     #region Teleport
 
-    public void TeleportPlayer(Transform newTransform)
+    public void TeleportPlayer(Transform newTransform, bool setRotation = true, bool useFade = true)
     {
-        if (_crRunning) return;
 
-        if (teleportCoroutine != null)
-        {
-            StopCoroutine(teleportCoroutine);
-        }
-
-        teleportCoroutine = StartCoroutine(TeleportAction(newTransform, true));
-    }
-
-    public void TeleportPlayer(Transform newTransform, bool setRotation)
-    {
-        if (_crRunning) return;
-
-        if (teleportCoroutine != null)
-        {
-            StopCoroutine(teleportCoroutine);
-        }
-
-        teleportCoroutine = StartCoroutine(TeleportAction(newTransform, setRotation));
-    }
-
-    IEnumerator TeleportAction(Transform newTransform, bool setRotation)
-    {
-        // Guardamos la pose objetivo al inicio
         Pose teleportPose = new Pose { position = newTransform.position, rotation = newTransform.rotation };
 
+        if (useFade)
+        {
+            if (_crRunning) return;
+            if (teleportCoroutine != null)
+            {
+                StopCoroutine(teleportCoroutine);
+            }
+            teleportCoroutine = StartCoroutine(TeleportAction(teleportPose, setRotation));
+
+        }
+        else
+        {
+            if (setRotation)
+            {
+                ChangePlayerPose(teleportPose);
+            }
+            else
+            {
+                ChangePlayerPosition(teleportPose.position);
+            }
+        }
+         
+    }
+
+    IEnumerator TeleportAction(Pose teleportPose, bool setRotation)
+    {   
         _crRunning = true;
         fader.FadeIn();
 
