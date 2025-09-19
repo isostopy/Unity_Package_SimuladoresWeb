@@ -1,5 +1,5 @@
 (() => {
-  const ENDPOINT_ME = 'https://test.isostopyserver.net/api/auth/me';
+  const ENDPOINT_ME = 'https://test.isostopyserver.net/api/users/me';
   const AUTH_FAIL_STATUSES = new Set([401, 403, 419]); // estados que SÍ confirman token inválido
 
   function clearToken() {

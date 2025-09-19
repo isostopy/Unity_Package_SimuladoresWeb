@@ -9,7 +9,7 @@ using UnityEngine.Events;
 public class EvaluationRecordManager : MonoBehaviour
 {
     public static EvaluationRecordManager Instance { get; private set; }
-    public string url = "https://test.isostopyserver.net/api/auth/me";
+    public string url = "https://test.isostopyserver.net/api/users/report";
     
     [Header("Mensaje de estado del POST")]
     [SerializeField] private TextMeshProUGUI postStatusText;

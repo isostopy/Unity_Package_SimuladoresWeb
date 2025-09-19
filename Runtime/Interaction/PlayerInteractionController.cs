@@ -22,8 +22,8 @@ public class PlayerInteractionController : MonoBehaviour
     public TeleportPoint[] teleportPoints;
 
     // --- Estado interno ---
-    private ISelectable _currentSelection;
-    private ISelectable _lastSelection;
+    public ISelectable currentSelection;
+    public ISelectable lastSelection;
 
     private Coroutine teleportCoroutine;
     private bool _crRunning;
@@ -140,9 +140,9 @@ public class PlayerInteractionController : MonoBehaviour
 
     public void TeleportToSelectionAnchor()
     {
-        if (_currentSelection == null) return;
+        if (currentSelection == null) return;
 
-        var go = _currentSelection.gameObject;
+        var go = currentSelection.gameObject;
         if (go == null) return;
 
         var anchorComp = go.GetComponent<SelectableTeleportAnchor>();
@@ -184,33 +184,33 @@ public class PlayerInteractionController : MonoBehaviour
     #region Inputs & Selection
 
 
-    public bool HasSelection => _currentSelection != null;
+    public bool HasSelection => currentSelection != null;
 
     public void Select(ISelectable selection)
     {
         if (selection == null)
         {
-            if (_lastSelection != null) _lastSelection.SelectionDeselect();
-            _currentSelection = null;
-            _lastSelection = null;
+            if (lastSelection != null) lastSelection.SelectionDeselect();
+            currentSelection = null;
+            lastSelection = null;
             OnSelectionChanged?.Invoke(null);
             return;
         }
 
-        _currentSelection = selection;
+        currentSelection = selection;
 
-        if (_lastSelection != null) _lastSelection.SelectionDeselect();
+        if (lastSelection != null) lastSelection.SelectionDeselect();
 
-        _lastSelection = _currentSelection;
+        lastSelection = currentSelection;
         selection.SelectionSelect();
-        OnSelectionChanged?.Invoke(_currentSelection);
+        OnSelectionChanged?.Invoke(currentSelection);
     }
 
     // Indica si la selección actual tiene un SelectableTeleportAnchor con anchor válido
     public bool SelectionHasTeleportAnchor()
     {
-        if (_currentSelection == null) return false;
-        var go = _currentSelection.gameObject;
+        if (currentSelection == null) return false;
+        var go = currentSelection.gameObject;
         if (go == null) return false;
         var anchorComp = go.GetComponent<SelectableTeleportAnchor>();
         return anchorComp != null && anchorComp.anchor != null;
