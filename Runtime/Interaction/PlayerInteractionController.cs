@@ -101,6 +101,11 @@ public class PlayerInteractionController : MonoBehaviour
          
     }
 
+    public void TeleportPlayer(Transform targetTransform)
+    {
+        TeleportPlayer(targetTransform, true);
+    }
+
     IEnumerator TeleportAction(Pose teleportPose, bool setRotation)
     {   
         _crRunning = true;
