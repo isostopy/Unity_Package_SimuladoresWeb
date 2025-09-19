@@ -2239,7 +2239,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b909248a435eda94a98bc46d0c9a8e78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  url: https://test.isostopyserver.net/api/auth/me
+  url: https://test.isostopyserver.net/api/users/report
   postStatusText: {fileID: 1542639399}
   sendingMessage: Enviando...
   successMessage: "POST enviado con \xE9xito"
