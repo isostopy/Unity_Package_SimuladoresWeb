@@ -368,7 +368,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1963975396274622565}
   m_Layer: 0
-  m_Name: PanelUI
+  m_Name: 3DPanel_UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
