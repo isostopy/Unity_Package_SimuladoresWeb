@@ -64,6 +64,17 @@ public class FirstPersonLook : MonoBehaviour
 		}
 	}
 
+	private void Start()
+	{
+		// Si el player tiene una rotación inicial, la trasladamos a yaw/pitch y dejamos el player en identidad
+		Quaternion initialWorldRotation = transform.rotation;
+		if (initialWorldRotation != Quaternion.identity)
+		{
+			transform.rotation = Quaternion.identity;
+			ApplyWorldRotation(initialWorldRotation);
+		}
+	}
+
 	private void Update()
 	{
 		if (InputService.Instance == null)
