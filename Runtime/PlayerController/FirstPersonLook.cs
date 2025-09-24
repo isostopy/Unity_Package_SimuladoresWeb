@@ -250,6 +250,28 @@ public class FirstPersonLook : MonoBehaviour
         _yaw = 0;
         _pitch = 0;
     }
+
+	public void ApplyWorldRotation(Quaternion worldRotation)
+	{
+		// Extrae yaw (Y) y pitch (X) de la rotación mundial y los aplica respetando límites
+		Vector3 euler = worldRotation.eulerAngles;
+		float targetYaw = NormalizeAngle(euler.y);
+		float targetPitch = NormalizeAngle(euler.x);
+		// Clamp del pitch dentro de los límites configurados
+		targetPitch = Mathf.Clamp(targetPitch, minPitch, maxPitch);
+
+		_yaw = targetYaw;
+		_pitch = targetPitch;
+
+		if (yawTransform != null)
+		{
+			yawTransform.localRotation = Quaternion.Euler(0f, _yaw, 0f);
+		}
+		if (pitchTransform != null)
+		{
+			pitchTransform.localRotation = Quaternion.Euler(_pitch, 0f, 0f);
+		}
+	}
 }
 
 

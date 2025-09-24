@@ -139,8 +139,14 @@ public class PlayerInteractionController : MonoBehaviour
     public void ChangePlayerPose(Pose newPose)
     {
         transform.position = newPose.position;
-        transform.rotation = newPose.rotation;
-        firstPersonLook.CenterLook();
+        if (firstPersonLook != null)
+        {
+            firstPersonLook.ApplyWorldRotation(newPose.rotation);
+        }
+        else
+        {
+            transform.rotation = newPose.rotation;
+        }
     }
 
     public void TeleportToSelectionAnchor()
